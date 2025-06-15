@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Letter for Her</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #f8d7da, #fad1e0);
+      font-family: 'Dancing Script', cursive;
+      overflow: hidden;
+      position: relative;
+    }
+    .welcome-screen {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 1;
+      transition: opacity 1s ease-out;
+      z-index: 2;
+    }
+    .welcome-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .welcome-title {
+      color: #fff;
+      font-size: 3em;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 2s ease-in;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .heart-particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .heart {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #ff69b4;
+      transform: rotate(45deg);
+      opacity: 0.7;
+      animation: float 5s ease-in-out infinite;
+    }
+    .heart::before,
+    .heart::after {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #ff69b4;
+      border-radius: 50%;
+    }
+    .heart::before {
+      top: -7.5px;
+      left: 0;
+    }
+    .heart::after {
+      top: 0;
+      left: -7.5px;
+    }
+    @keyframes float {
+      0% { transform: translateY(0) rotate(45deg); opacity: 0.7; }
+      50% { transform: translateY(-20px) rotate(45deg); opacity: 0.3; }
+      100% { transform: translateY(0) rotate(45deg); opacity: 0.7; }
+    }
+    .petals {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .petal {
+      position: absolute;
+      width: 10px;
+      height: 20px;
+      background: rgba(255, 105, 180, 0.5);
+      border-radius: 50%;
+      animation: fall 10s linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+    .container {
+      text-align: center;
+      opacity: 0;
+      transition: opacity 1s ease-in;
+      z-index: 1;
+    }
+    .container.visible {
+      opacity: 1;
+    }
+    .letter {
+      background: url('https://www.transparenttextures.com/patterns/paper.png'), #fffef0;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      margin: 20px;
+      border: 2px solid #f8b7c6;
+      transform: perspective(1000px) rotateY(90deg);
+      transition: transform 1s ease, box-shadow 0.5s ease;
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+    .letter.open {
+      transform: perspective(1000px) rotateY(0deg);
+      animation: shake 0.5s ease-in-out 1s, pulseGlow 2s ease-in-out infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 182, 193, 0.5); }
+      50% { box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 40px rgba(255, 182, 193, 0.8); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: perspective(1000px) rotateY(0deg); }
+      50% { transform: perspective(1000px) rotateY(5deg); }
+    }
+    h1 {
+      color: #a14b6b;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .message {
+      color: #4a2f3a;
+      font-size: 1.4em;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      opacity: 0;
+      transition: opacity 1s ease-in;
+    }
+    .message.visible {
+      opacity: 1;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1.2em;
+      background: #a14b6b;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      margin: 10px;
+      font-family: 'Dancing Script', cursive;
+    }
+    button:hover {
+      background: #8c3f5a;
+      transform: scale(1.05);
+    }
+    #audioToggle {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 3;
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-screen" id="welcomeScreen">
+    <h1 class="welcome-title">For You, My Heart</h1>
+    <div class="heart-particles" id="heartParticles"></div>
+  </div>
+  <div class="petals" id="petals"></div>
+  <div class="container">
+    <button id="openLetter" style="font-family: 'Dancing Script', cursive; font-size: 2em; letter-spacing: 1px; padding: 16px 36px;">Unfold My Heart</button>
+    <div class="letter" id="letter" style="display: none;">
+      <h1>To My Dearest</h1>
+      <div class="message" id="message"></div>
+    </div>
+  </div>
+  <audio id="backgroundAudio" loop>
+    <source src="Glass Animals - Heat Waves.mp3" type="audio/mp3">
+  </audio>
+  <script>
+    // Start music from 42 seconds and set lower volume
+    const bgAudio = document.getElementById('backgroundAudio');
+    bgAudio.volume = 0.15;
+    bgAudio.currentTime = 42;
+  </script>
+  <footer style="position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; padding: 12px 0;  font-family: 'Times New Roman', Times, serif, cursive; color: #a14b6b; font-size: 1.2em; letter-spacing: 1px; z-index: 10;">
+    Designed by Chirag Pandit ❤️ with love 
+  </footer>
+  <button id="audioToggle" style="display: none;">Pause Music</button>
+
+  <script>
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const openButton = document.getElementById('openLetter');
+    const letter = document.getElementById('letter');
+    const message = document.getElementById('message');
+    const container = document.querySelector('.container');
+    const petalsContainer = document.getElementById('petals');
+    const heartParticles = document.getElementById('heartParticles');
+    const audio = document.getElementById('backgroundAudio');
+    const audioToggle = document.getElementById('audioToggle');
+
+    // Emotional message
+    const fullMessage = `My Dearest Madam,\n\nYour absence is a quiet ache, a whisper of longing that weaves through my days. I see you in the soft glow of dawn, in the fleeting warmth of a summer breeze. Your laughter, a melody that haunts my dreams, lingers like a star I cannot reach. Your eyes held galaxies, vast and radiant, calming the storms within me with a single glance. Every moment we shared is a treasure I carry, etched into my heart. I miss you—not just in words, but in the silence between them, in every breath that feels incomplete without you. If these words find you, know that my heart remains yours, waiting, hoping, loving.\n\nForever Yours,\n❤️`;
+
+    // Typewriter effect
+    function typeWriter(text, element, speed = 50, callback = null) {
+      let i = 0;
+      element.textContent = '';
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else if (callback) {
+          callback();
+        }
+      }
+      type();
+    }
+
+    // Create falling petals
+    function createPetals() {
+      for (let i = 0; i < 20; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        petal.style.left = `${Math.random() * 100}vw`;
+        petal.style.animationDelay = `${Math.random() * 10}s`;
+        petalsContainer.appendChild(petal);
+      }
+    }
+
+    // Create heart particles
+    function createHearts() {
+      for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.top = `${Math.random() * 100}vh`;
+        heart.style.animationDelay = `${Math.random() * 5}s`;
+        heartParticles.appendChild(heart);
+      }
+    }
+
+    // Audio toggle
+    audio.volume = 0.01; // Lower volume for subtlety
+    let isPlaying = false;
+    audioToggle.addEventListener('click', () => {
+      if (isPlaying) {
+        audio.pause();
+        audioToggle.textContent = 'Play Music';
+        isPlaying = false;
+      } else {
+        audio.play();
+        audioToggle.textContent = 'Pause Music';
+        isPlaying = true;
+      }
+    });
+
+    // Show letter and start audio
+    openButton.addEventListener('click', () => {
+      openButton.style.display = 'none';
+      letter.style.display = 'block';
+      letter.classList.add('open');
+      audio.play();
+      audioToggle.style.display = 'block';
+      isPlaying = true;
+      setTimeout(() => {
+        message.classList.add('visible');
+        typeWriter(fullMessage, message);
+      }, 1000);
+    });
+
+    // Transition from welcome screen to letter
+    setTimeout(() => {
+      welcomeScreen.classList.add('hidden');
+      container.classList.add('visible');
+    }, 3000);
+
+    // Initialize
+    window.addEventListener('load', () => {
+      createPetals();
+      createHearts();
+    });
+  </script>
+</body>
+</html>
